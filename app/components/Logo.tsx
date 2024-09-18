@@ -7,7 +7,7 @@ const Logo = () => {
     return (
         <Link href={"/"}>
             <Flex align={'center'} justify={'center'} className="">
-                <div className="w-[23px] h-[23px] justify-center flex rounded-lg bg-[var(--mantine-primary-color-filled)]">
+                <div className="w-[23px] h-[23px] justify-center flex rounded-md bg-[var(--mantine-primary-color-filled)]">
                 </div>
                 <Space mx={3} />
                 <Text fw={600} size='lg'

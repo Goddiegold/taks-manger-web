@@ -1,7 +1,9 @@
 import { Inter } from 'next/font/google'
 import { ColorSchemeScript, MantineProvider } from "@mantine/core";
+import '@mantine/notifications/styles.css';
 import '@mantine/core/styles.css';
 import "./globals.css";
+import { Notifications } from '@mantine/notifications';
 
 const inter = Inter({
   subsets: ['latin'],
@@ -33,6 +35,7 @@ export default function RootLayout({
       </head>
       <body className={inter.variable}>
         <MantineProvider>
+          <Notifications position="top-right" zIndex={2077} />
           {children}
         </MantineProvider>
       </body>
