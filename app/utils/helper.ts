@@ -1,4 +1,7 @@
+"use client";
+
 import { notifications } from "@mantine/notifications";
+import { Gear, ShoppingCart, SquaresFour } from "@phosphor-icons/react";
 
 export const toast = (message: string, title?: string) => {
     return {
@@ -18,6 +21,13 @@ export const toast = (message: string, title?: string) => {
     }
 }
 
+export const TASK_MANAGER_USER_TOKEN = 'TASK_MANAGER_USER_TOKEN';
+// export const removeUserToken = () => localStorage.removeItem(TASK_MANAGER_USER_TOKEN);
+export const removeUserToken = () => "";
+export const userToken = () => ""
+// export const userToken = () => localStorage.getItem(TASK_MANAGER_USER_TOKEN)
+
+
 export function getInitials(name: string) {
     if (!name) return;
     const firstName = name.toUpperCase()?.split(" ")[0]
@@ -34,7 +44,7 @@ export function truncateString(str: string, maxLength = 22) {
         return str;
     }
 }
-
+                        
 export function truncateStringAtMiddle(text: string, maxLength: number) {
     if (!text) return null;
     // If the text length is less than or equal to the max length, return the original text
@@ -52,3 +62,32 @@ export function truncateStringAtMiddle(text: string, maxLength: number) {
     // Return the truncated text with ellipsis in the middle
     return `${start}...${end}`;
 }
+
+
+export const menuData = [
+    {
+        link: '/dashboard',
+        label: 'Dashboard',
+        icon: SquaresFour
+    },
+    {
+        link: '/dashboard/tasks',
+        label: 'Task Managment',
+        icon: ShoppingCart
+    },
+    {
+        link: '/dashboard/projects',
+        label: 'Project Management',
+        icon: Gear
+    },
+    {
+        link: '/dashboard/team',
+        label: 'Team Management',
+        icon: Gear
+    },
+    {
+        link: '/dashboard',
+        label: 'Settings',
+        icon: Gear
+    },
+];
