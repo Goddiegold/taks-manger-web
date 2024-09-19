@@ -17,6 +17,9 @@ const config: Config = {
         inter: ['var(--font-inter)'],
         // langar:['var(--font-langar)'], 
       },
+      colors:{
+        primary:"var(--mantine-primary-color-filled)"
+      }
     },
   },
   plugins: [],

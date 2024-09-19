@@ -1,13 +1,11 @@
-import { Flex, Text, Image, Space } from "@mantine/core";
+import { Flex, Text, Space } from "@mantine/core";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
 
 const Logo = () => {
-    const router = useRouter()
     return (
         <Link href={"/"}>
             <Flex align={'center'} justify={'center'} className="">
-                <div className="w-[23px] h-[23px] justify-center flex rounded-md bg-[var(--mantine-primary-color-filled)]">
+                <div className="w-[23px] h-[23px] justify-center flex rounded-md bg-primary">
                 </div>
                 <Space mx={3} />
                 <Text fw={600} size='lg'

@@ -22,10 +22,8 @@ export const toast = (message: string, title?: string) => {
 }
 
 export const TASK_MANAGER_USER_TOKEN = 'TASK_MANAGER_USER_TOKEN';
-// export const removeUserToken = () => localStorage.removeItem(TASK_MANAGER_USER_TOKEN);
-export const removeUserToken = () => "";
-export const userToken = () => ""
-// export const userToken = () => localStorage.getItem(TASK_MANAGER_USER_TOKEN)
+export const removeUserToken = () => typeof window !== "undefined" ? localStorage.removeItem(TASK_MANAGER_USER_TOKEN) : null;
+export const userToken = () => typeof window !== "undefined"?localStorage.getItem(TASK_MANAGER_USER_TOKEN):null
 
 
 export function getInitials(name: string) {
@@ -44,7 +42,7 @@ export function truncateString(str: string, maxLength = 22) {
         return str;
     }
 }
-                        
+
 export function truncateStringAtMiddle(text: string, maxLength: number) {
     if (!text) return null;
     // If the text length is less than or equal to the max length, return the original text

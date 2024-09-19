@@ -4,6 +4,8 @@ import '@mantine/notifications/styles.css';
 import '@mantine/core/styles.css';
 import "./globals.css";
 import { Notifications } from '@mantine/notifications';
+import UserContextProvider from './context/UserContext';
+import QueryClientProviderWrapper from './QueryClientProvider';
 
 const inter = Inter({
   subsets: ['latin'],
@@ -15,6 +17,8 @@ export const metadata = {
   title: 'Task Manager',
   description: 'Tool for team to manage tasks within the organization',
 }
+
+
 
 export default function RootLayout({
   children,
@@ -36,7 +40,11 @@ export default function RootLayout({
       <body className={inter.variable}>
         <MantineProvider>
           <Notifications position="top-right" zIndex={2077} />
-          {children}
+          <QueryClientProviderWrapper>
+            <UserContextProvider>
+              {children}
+            </UserContextProvider>
+          </QueryClientProviderWrapper>
         </MantineProvider>
       </body>
     </html>
