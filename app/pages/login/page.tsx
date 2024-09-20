@@ -10,10 +10,12 @@ import { toast } from "@/app/utils/helper";
 import client from "@/app/utils/client";
 import { useUserContext } from "@/app/context/UserContext";
 import { Action_Type, User } from "@/app/utils/types";
+import { useRouter } from "next/navigation";
 
 const LoginPage = () => {
   const [loading, setLoading] = useState(false);
   const { userDispatch } = useUserContext()
+  const router = useRouter()
 
   const handleLogin = async (user: Partial<User>) => {
     try {
@@ -30,6 +32,7 @@ const LoginPage = () => {
       })
       toast(res?.data?.message).success()
       setLoading(false)
+      router.push("/pages/dashboard")
     } catch (error) {
       setLoading(false)
       toast(error?.response?.data?.message).error()
@@ -104,7 +107,7 @@ const LoginPage = () => {
           type="submit"
           radius="md"
         >
-         Login in
+          Login in
         </Button>
       </form>
     </AuthLayout>

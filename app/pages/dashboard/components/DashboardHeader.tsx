@@ -8,8 +8,11 @@ import { Bell, CaretRight, Moon, Sun } from "@phosphor-icons/react";
 // import { getInitials, menuData, removeUserToken } from "@/shared/helpers";
 // import { IoMdLogOut } from "react-icons/io";
 // import { useUserContext } from "@/context/UserContext";
-import { getInitials, menuData } from "@/app/utils/helper";
+import { getInitials, menuData, removeUserToken } from "@/app/utils/helper";
 import Logo from "@/app/components/Logo";
+import { useUserContext } from "@/app/context/UserContext";
+import { Action_Type } from "@/app/utils/types";
+import { useRouter } from "next/navigation";
 // import { useNavigate } from "react-router-dom";
 // import { useClient } from "@/shared/client";
 // import { useQuery } from "@tanstack/react-query";
@@ -26,26 +29,26 @@ const DashboardHeader: React.FC<DashboardHeaderProps> =
     ({ mobileOpened, toggleMobile }) => {
         const { colorScheme, toggleColorScheme } = useMantineColorScheme();
         const dark = colorScheme === 'dark';
-        // const navigate = useNavigate()
-        // const navigateHelper = useNavigation()
-        // const { user, userDispatch } = useUserContext()
+        const { user, userDispatch } = useUserContext()
+        const router = useRouter()
         // const isAdmin = user?.role === user_role.admin
         // const queryKey = ["notifications", user?.id]
         // const clientInstance = useClient()
 
         const handleLogout = () => {
-            // removeUserToken()
-            // userDispatch({
-            //     type: Action_Type.LOGOUT_USER,
-            //     payload: null
-            // })
-            // navigate(user?.role === user_role.vendor ? `/${user?.company?.slug}/login` : "/login")
+            removeUserToken()
+            userDispatch({
+                type: Action_Type.LOGOUT_USER,
+                payload: null
+            })
+            router.push("/pages/login")
         }
 
         const MenuOptions = () => {
             return (<>
-                {menuData?.map(item => (
+                {menuData?.map((item, idx) => (
                     <Menu.Item
+                        key={idx}
                         // onClick={() => navigateHelper(item.link)}
                         my={10}
                         leftSection={<item.icon size={20} />}>{item.label}</Menu.Item>
@@ -88,7 +91,7 @@ const DashboardHeader: React.FC<DashboardHeaderProps> =
                             </ActionIcon>
                         </Tooltip>
 
-                        
+
                     </Flex>
 
                     <Menu shadow="md" width={200}>
@@ -108,10 +111,10 @@ const DashboardHeader: React.FC<DashboardHeaderProps> =
                                         w={50}
                                         h={50}
                                         src={""}
-                                    >{getInitials("Doe")}</Avatar>
+                                    >{getInitials(user.name!)}</Avatar>
                                     <Flex direction={'column'} className='hidden md:flex max-w-[80%]' align={'flex-start'}>
-                                        <Text fw={700} c='dark'>Doe</Text>
-                                        <Text size={'xs'} c={'gray'} className="!break-all text-wrap items-start text-start">doe@gmail.com</Text>
+                                        <Text fw={700} c={!dark ? 'dark' : "gray"}>{user?.name}</Text>
+                                        <Text size={'xs'} c={'gray'} className="!break-all text-wrap items-start text-start">{user?.email}</Text>
                                     </Flex>
                                 </Flex>
                             </Button>

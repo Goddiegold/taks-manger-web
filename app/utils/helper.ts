@@ -64,27 +64,27 @@ export function truncateStringAtMiddle(text: string, maxLength: number) {
 
 export const menuData = [
     {
-        link: '/dashboard',
+        link: '/pages/dashboard',
         label: 'Dashboard',
         icon: SquaresFour
     },
     {
-        link: '/dashboard/tasks',
+        link: '/pages/dashboard/tasks',
         label: 'Task Managment',
         icon: ShoppingCart
     },
     {
-        link: '/dashboard/projects',
+        link: '/pages/dashboard/projects',
         label: 'Project Management',
         icon: Gear
     },
     {
-        link: '/dashboard/team',
+        link: '/pages/dashboard/team',
         label: 'Team Management',
         icon: Gear
     },
     {
-        link: '/dashboard',
+        link: '/pages/dashboard',
         label: 'Settings',
         icon: Gear
     },

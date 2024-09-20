@@ -8,9 +8,13 @@ import { Action_Type, User, UserContextType } from '@/app/utils/types';
 import { useQuery } from '@tanstack/react-query';
 import { removeUserToken, TASK_MANAGER_USER_TOKEN, toast, userToken } from '../utils/helper';
 import { useClient } from '../utils/client';
-import AppLoader from '../components/AppLoader';
+// import AppLoader from '../components/AppLoader';
+import dynamic from 'next/dynamic'
+ 
+const AppLoader = dynamic(() => import('../components/AppLoader'), { ssr: false })
 
 const UserContext = createContext<UserContextType>({});
+
 
 const userReducer = (state: any, action: { payload?: any, type: Action_Type }) => {
     switch (action.type) {
@@ -74,6 +78,7 @@ const UserContextProvider = ({ children }: { children: ReactNode }) => {
     return (
         <UserContext.Provider value={contextValue}>
             {isLoading ? <AppLoader /> : <>{children}</>}
+            {/* {children} */}
         </UserContext.Provider>
     )
 

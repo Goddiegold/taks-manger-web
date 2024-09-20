@@ -14,64 +14,64 @@ import { useRouter } from 'next/navigation';
 // import useNavigation from '@/hooks/useNavigation';
 
 export default function Sidebar() {
-//   const { user, userDispatch } = useUserContext()
+  //   const { user, userDispatch } = useUserContext()
   const [active, setActive] = useState('Billing');
   const [userMenuData, setMenuData] = useState(menuData)
   const router = useRouter()
-//   const navigate = useNavigation()
-//   const { pathname } = useLocation()
+  //   const navigate = useNavigation()
+  //   const { pathname } = useLocation()
 
 
-//   useEffect(() => {
-//     const copyData = [...menuData];
-//     let position: number = 0;
-//     let newItem: any[];
+  //   useEffect(() => {
+  //     const copyData = [...menuData];
+  //     let position: number = 0;
+  //     let newItem: any[];
 
-//     if (user?.role === user_role.vendor) {
-//       position = 1;
-//       newItem = [
-//         {
-//           link: '/dashboard/wallet',
-//           label: 'Wallet',
-//           icon: Wallet
-//         },
-//       ]
-//     }
+  //     if (user?.role === user_role.vendor) {
+  //       position = 1;
+  //       newItem = [
+  //         {
+  //           link: '/dashboard/wallet',
+  //           label: 'Wallet',
+  //           icon: Wallet
+  //         },
+  //       ]
+  //     }
 
-//     if (user?.role === user_role.company || user?.role === user_role.admin) {
-//       position = 1;
-//       newItem = [
-//         {
-//           link: "/dashboard/registered-vendors",
-//           label: "Vendors",
-//           icon: Handshake
-//         },
-//       ]
+  //     if (user?.role === user_role.company || user?.role === user_role.admin) {
+  //       position = 1;
+  //       newItem = [
+  //         {
+  //           link: "/dashboard/registered-vendors",
+  //           label: "Vendors",
+  //           icon: Handshake
+  //         },
+  //       ]
 
-//       if (user?.role === user_role.admin) {
-//         newItem = [
-//           {
-//             link: "/dashboard/registered-companies",
-//             label: "Companies",
-//             icon: BuildingOffice
-//           },
-//           ...newItem
-//         ]
-//       }
-//     }
+  //       if (user?.role === user_role.admin) {
+  //         newItem = [
+  //           {
+  //             link: "/dashboard/registered-companies",
+  //             label: "Companies",
+  //             icon: BuildingOffice
+  //           },
+  //           ...newItem
+  //         ]
+  //       }
+  //     }
 
-//     if (newItem) {
-//       copyData.splice(position, 0, ...newItem)
-//     }
-//     setMenuData(copyData)
-//   }, [user]);
+  //     if (newItem) {
+  //       copyData.splice(position, 0, ...newItem)
+  //     }
+  //     setMenuData(copyData)
+  //   }, [user]);
 
-//   useEffect(() => {
-//     const urlPaths = pathname.split('/');
-//     console.log("urlPaths", urlPaths)
-//     const currentPath = urlPaths[2] ? `/${urlPaths[1]}/${urlPaths[2]}` : `/${urlPaths[1]}`
-//     setActive(currentPath)
-//   }, [pathname])
+  //   useEffect(() => {
+  //     const urlPaths = pathname.split('/');
+  //     console.log("urlPaths", urlPaths)
+  //     const currentPath = urlPaths[2] ? `/${urlPaths[1]}/${urlPaths[2]}` : `/${urlPaths[1]}`
+  //     setActive(currentPath)
+  //   }, [pathname])
 
   const links = userMenuData.map((item) => (
     <a

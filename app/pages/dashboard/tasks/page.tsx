@@ -1,6 +1,6 @@
 
 "use client";
-import { Button, Flex, Modal, Table, Text } from "@mantine/core";
+import { Button, Flex, Modal, Table, Text, Textarea, TextInput } from "@mantine/core";
 import ListingCard from "../components/cards/ListingCard";
 import { Plus } from "@phosphor-icons/react";
 import { useDisclosure } from "@mantine/hooks";
@@ -50,7 +50,15 @@ const TasksPage = () => {
       <Modal opened={opened} 
       onClose={close}
       title={<Text fw={600}>Create new task</Text>} centered>
-        {/* Modal content */}
+         <form>
+          <TextInput
+            label={"Title"} />
+          {/* date select */}
+          <Textarea
+            minRows={3}
+            maxRows={7} />
+          <Button>Proceed</Button>
+        </form>
       </Modal>
     </>
   );

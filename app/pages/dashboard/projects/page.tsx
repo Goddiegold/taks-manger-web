@@ -1,13 +1,20 @@
 
 "use client";
-import { Button, Flex, Modal, Table, Text } from "@mantine/core";
+import { Button, Flex, Modal, Table, Text, Textarea, TextInput, } from "@mantine/core";
 import ListingCard from "../components/cards/ListingCard";
 import { useDisclosure } from "@mantine/hooks";
 import { Plus } from "@phosphor-icons/react";
+import { useState } from "react";
 
 
 const TasksPage = () => {
   const [opened, { open, close }] = useDisclosure(false);
+
+  const [newTask, setNewTask] = useState({
+    name: "",
+    details: ""
+  })
+  
   const elements = [
     { position: 6, mass: 12.011, symbol: 'C', name: 'Carbon' },
     { position: 7, mass: 14.007, symbol: 'N', name: 'Nitrogen' },
@@ -49,8 +56,8 @@ const TasksPage = () => {
 
       <Modal opened={opened}
         onClose={close}
-        title={<Text fw={600}>Create new task</Text>} centered>
-        {/* Modal content */}
+        title={<Text fw={600}>Create new project</Text>} centered>
+
       </Modal>
     </>
   );

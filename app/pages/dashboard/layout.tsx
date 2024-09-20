@@ -2,7 +2,7 @@
 
 import { AppShell, Button, CopyButton, Flex, Text, Tooltip, useMantineColorScheme } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
-import { useEffect, useState } from 'react';
+import { ReactNode, useEffect, useState } from 'react';
 import AuthWrapper from './components/AuthWrapper';
 import Sidebar from './components/sidebar';
 import DashboardHeader from './components/DashboardHeader';
@@ -45,7 +45,7 @@ export default function DashboardLayout({ children }: Props) {
 
     // const { isLoggedIn, user } = useUserContext()
     return (
-        // <AuthWrapper>
+        <AuthWrapper>
             <AppShell
                 header={{ height: 90 }}
                 navbar={{
@@ -65,7 +65,6 @@ export default function DashboardLayout({ children }: Props) {
                 </AppShell.Header>
 
                 <AppShell.Navbar >
-                    {/* <NavbarSimpleColored /> */}
                     <Sidebar />
                 </AppShell.Navbar>
                 <AppShell.Main
@@ -77,6 +76,6 @@ export default function DashboardLayout({ children }: Props) {
                     </Flex>
                 </AppShell.Main>
             </AppShell>
-        // </AuthWrapper>
+        </AuthWrapper>
     );
 }
