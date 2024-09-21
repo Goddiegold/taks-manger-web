@@ -1,4 +1,3 @@
-Got it! Here’s a Markdown snippet specifically tailored for your Next.js app's README on GitHub. You can copy and paste this section directly into your README file.
 
 ```markdown
 ## Deploying to Vercel
