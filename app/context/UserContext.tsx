@@ -62,6 +62,7 @@ const UserContextProvider = ({ children }: { children: ReactNode }) => {
                     type: Action_Type.LOGOUT_USER,
                 })
                 if (!userToken()) {
+                    //@ts-ignore
                     toast(err?.response?.data?.message).error()
                 }
             }

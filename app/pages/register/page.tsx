@@ -35,6 +35,7 @@ const RegisterPage = () => {
       setLoading(false)
     } catch (error) {
       setLoading(false)
+       //@ts-ignore
       toast(error?.response?.data?.message).error()
     }
   };
