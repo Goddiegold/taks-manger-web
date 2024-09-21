@@ -1,7 +1,7 @@
 "use client";
 
 import { notifications } from "@mantine/notifications";
-import { Gear, ShoppingCart, SquaresFour } from "@phosphor-icons/react";
+import { Gear, Notebook, Notepad, ShoppingCart, SquaresFour } from "@phosphor-icons/react";
 
 export const toast = (message: string, title?: string) => {
     return {
@@ -72,12 +72,12 @@ export const menuData = [
     {
         link: '/pages/dashboard/tasks',
         label: 'Task Managment',
-        icon: ShoppingCart
+        icon: Notepad
     },
     {
         link: '/pages/dashboard/projects',
         label: 'Project Management',
-        icon: Gear
+        icon: Notebook 
     },
     // {
     //     link: '/pages/dashboard/team',
@@ -85,7 +85,7 @@ export const menuData = [
     //     icon: Gear
     // },
     {
-        link: '/pages/dashboard',
+        link: '#',
         label: 'Settings',
         icon: Gear
     },

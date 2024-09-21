@@ -6,7 +6,8 @@ import {
   Badge,
   ActionIcon,
   MultiSelect,
-  Center
+  Center,
+  TableScrollContainer
 } from "@mantine/core";
 import ListingCard from "../components/cards/ListingCard";
 import { Plus, Trash, PencilLine } from "@phosphor-icons/react";
@@ -167,6 +168,7 @@ const ProjectPage = () => {
 
       <ListingCard>
         {!isLoading ?
+        <TableScrollContainer minWidth={500}>
           <Table
             highlightOnHover
             striped="even"
@@ -213,7 +215,9 @@ const ProjectPage = () => {
                 </Table.Tr>
               ))}
             </Table.Tbody> : null}
-          </Table> : <>
+          </Table>
+        </TableScrollContainer>
+           : <>
             {Array(5).fill(null).map((item, key) => (
               <Skeleton
                 className="w-full h-[50px] mb-[24px] last:mb-0"

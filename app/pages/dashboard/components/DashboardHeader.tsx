@@ -1,23 +1,15 @@
 "use client";
-import {
-    ActionIcon, Avatar, Burger, Button, Flex, Group, Indicator, Menu,
-    Text, Tooltip, useMantineColorScheme
-} from "@mantine/core";
-// import Logo from "./Logo";
-import { Bell, CaretRight, Moon, Sun } from "@phosphor-icons/react";
-// import { getInitials, menuData, removeUserToken } from "@/shared/helpers";
-// import { IoMdLogOut } from "react-icons/io";
-// import { useUserContext } from "@/context/UserContext";
-import { getInitials, menuData, removeUserToken } from "@/app/utils/helper";
 import Logo from "@/app/components/Logo";
 import { useUserContext } from "@/app/context/UserContext";
+import { getInitials, menuData, removeUserToken } from "@/app/utils/helper";
 import { Action_Type } from "@/app/utils/types";
+import {
+    ActionIcon, Avatar, Burger, Button, Flex, Group,
+    Menu,
+    Text, Tooltip, useMantineColorScheme
+} from "@mantine/core";
+import { CaretRight, Moon, SignOut, Sun } from "@phosphor-icons/react";
 import { useRouter } from "next/navigation";
-// import { useNavigate } from "react-router-dom";
-// import { useClient } from "@/shared/client";
-// import { useQuery } from "@tanstack/react-query";
-// import { Action_Type, user_role } from "@/shared/types";
-// import useNavigation from "@/hooks/useNavigation";
 
 interface DashboardHeaderProps {
     mobileOpened: boolean,
@@ -31,9 +23,6 @@ const DashboardHeader: React.FC<DashboardHeaderProps> =
         const dark = colorScheme === 'dark';
         const { user, userDispatch } = useUserContext()
         const router = useRouter()
-        // const isAdmin = user?.role === user_role.admin
-        // const queryKey = ["notifications", user?.id]
-        // const clientInstance = useClient()
 
         const handleLogout = () => {
             removeUserToken()
@@ -49,28 +38,12 @@ const DashboardHeader: React.FC<DashboardHeaderProps> =
                 {menuData?.map((item, idx) => (
                     <Menu.Item
                         key={idx}
-                        // onClick={() => navigateHelper(item.link)}
+                        onClick={() => { if (item.link === "#") return; router.push(item.link) }}
                         my={10}
                         leftSection={<item.icon size={20} />}>{item.label}</Menu.Item>
                 ))}
             </>)
         }
-
-        // const { isLoading, isRefetching, data } = useQuery({
-        //     queryKey,
-        //     queryFn: async () => {
-        //         try {
-        //             const response = await clientInstance().get("/users/notifications")
-        //             return response.data?.result as [];
-        //         } catch (error) {
-        //             console.log(error);
-        //         }
-        //     },
-        //     // refetchOnMount: "always",
-        //     refetchInterval: 1200000,
-        //     enabled: !isAdmin,
-        // })
-
         return (
             <Group h="100%" px="md" justify="space-between">
                 <Burger opened={mobileOpened} onClick={toggleMobile} hiddenFrom="sm" size="sm" />
@@ -111,7 +84,7 @@ const DashboardHeader: React.FC<DashboardHeaderProps> =
                                         w={50}
                                         h={50}
                                         src={""}
-                                    >{getInitials(user.name!)}</Avatar>
+                                    >{getInitials(user?.name || "Anonymous")}</Avatar>
                                     <Flex direction={'column'} className='hidden md:flex max-w-[80%]' align={'flex-start'}>
                                         <Text fw={700} c={!dark ? 'dark' : "gray"}>{user?.name}</Text>
                                         <Text size={'xs'} c={'gray'} className="!break-all text-wrap items-start text-start">{user?.email}</Text>
@@ -141,7 +114,7 @@ const DashboardHeader: React.FC<DashboardHeaderProps> =
                             </Flex>
                             <Menu.Item
                                 my={10}
-                                // leftSection={<IoMdLogOut stroke={`1.5`} size={20} />}
+                                leftSection={<SignOut size={20} stroke={"1.5"} />}
                                 onClick={handleLogout}>Logout</Menu.Item>
                         </Menu.Dropdown>
                     </Menu>
