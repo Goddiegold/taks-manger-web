@@ -55,10 +55,3 @@ Deploying your Next.js application to Vercel is simple and efficient. Follow the
 - **Serverless Functions**: Use Next.js API routes as serverless functions.
 - **Analytics**: Monitor your app's performance and traffic.
 
-### Conclusion
-
-Vercel makes it easy to deploy your Next.js application with powerful features to enhance your workflow. Enjoy building and deploying!
-
-```
-
-Feel free to modify any parts as needed!
