@@ -20,7 +20,7 @@ const LoginPage = () => {
   const handleLogin = async (user: Partial<User>) => {
     try {
       setLoading(true)
-      const res = await client().post("/auth/login", { ...user })
+      const res = await client().post("/users/login", { ...user })
       const userDetails = res?.data?.result as User
       const token = res.headers["authorization"]
       userDispatch({
@@ -31,8 +31,8 @@ const LoginPage = () => {
         }
       })
       toast(res?.data?.message).success()
-      setLoading(false)
       router.push("/pages/dashboard")
+      setLoading(false)
     } catch (error) {
       setLoading(false)
       toast(error?.response?.data?.message).error()

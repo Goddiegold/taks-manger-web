@@ -12,7 +12,7 @@ export type User = {
 }
 
 export enum user_role {
-    team="team", 
+    team = "team",
     admin = "admin"
 }
 
@@ -20,4 +20,21 @@ export interface UserContextType {
     isLoggedIn: boolean,
     user: User | null,
     userDispatch: React.Dispatch<{ payload?: any, type: Action_Type }>
+}
+
+export type Task = {
+    id: string;
+    name: string;
+    details: string | null;
+    createdAt: Date;
+    updatedAt: Date;
+    authorId: string;
+}
+export type Project = {
+    id: string;
+    name: string;
+    details: string | null;
+    createdAt: Date;
+    updatedAt: Date;
+    authorId: string;
 }

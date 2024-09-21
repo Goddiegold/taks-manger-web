@@ -64,7 +64,7 @@ function usePagination<T>({ data, itemsPerPage = 5, withControls = false, watchF
     const PaginationBtnHelper = () => (
         <Pagination
             withControls={withControls}
-            color="purple"
+            color="var(--mantine-primary-color-filled)"
             size="sm"
             value={currentPage}
             total={totalPage}

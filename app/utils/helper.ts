@@ -64,7 +64,8 @@ export function truncateStringAtMiddle(text: string, maxLength: number) {
 
 export const menuData = [
     {
-        link: '/pages/dashboard',
+        // link: '/pages/dashboard',
+        link: '#',
         label: 'Dashboard',
         icon: SquaresFour
     },
@@ -78,11 +79,11 @@ export const menuData = [
         label: 'Project Management',
         icon: Gear
     },
-    {
-        link: '/pages/dashboard/team',
-        label: 'Team Management',
-        icon: Gear
-    },
+    // {
+    //     link: '/pages/dashboard/team',
+    //     label: 'Team Management',
+    //     icon: Gear
+    // },
     {
         link: '/pages/dashboard',
         label: 'Settings',

@@ -20,7 +20,7 @@ const RegisterPage = () => {
   const handleRegister = async (user: Partial<User>) => {
     try {
       setLoading(true)
-      const res = await client().post("/auth/register", { ...user })
+      const res = await client().post("/users/register", { ...user })
       const userDetails = res?.data?.result as User
       const token = res.headers["authorization"]
       userDispatch({
