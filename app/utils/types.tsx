@@ -37,4 +37,15 @@ export type Project = {
     createdAt: Date;
     updatedAt: Date;
     authorId: string;
+    assignments: string[] | Partial<AssignedProject>[]
+}
+
+export type AssignedProject = {
+    id: string;
+    deadline: Date;
+    userId: string;
+    projectId: string;
+    assignedById: string;
+    createdAt: Date;
+    updatedAt: Date;
 }
