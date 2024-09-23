@@ -2,14 +2,18 @@
 
 import { notifications } from "@mantine/notifications";
 import { Gear, Notebook, Notepad, ShoppingCart, SquaresFour } from "@phosphor-icons/react";
+import { io } from "socket.io-client";
+import { User } from "./types";
+import { NotificationPosition } from "@mantine/notifications/lib/notifications.store";
 
-export const toast = (message: string, title?: string) => {
+export const toast = (message: string, title?: string, position?: NotificationPosition) => {
     return {
         success: () => notifications.show({
             color: "green",
             title: title ? title : 'Success',
             message,
             withBorder: true,
+            position
             // autoClose: 5000
         }),
         error: () => notifications.show({
@@ -17,13 +21,14 @@ export const toast = (message: string, title?: string) => {
             title: title ? title : 'Failed',
             message: message ?? "Something went wrong!",
             withBorder: true,
+            position
         })
     }
 }
 
 export const TASK_MANAGER_USER_TOKEN = 'TASK_MANAGER_USER_TOKEN';
 export const removeUserToken = () => typeof window !== "undefined" ? localStorage.removeItem(TASK_MANAGER_USER_TOKEN) : null;
-export const userToken = () => typeof window !== "undefined"?localStorage.getItem(TASK_MANAGER_USER_TOKEN):null
+export const userToken = () => typeof window !== "undefined" ? localStorage.getItem(TASK_MANAGER_USER_TOKEN) : null
 
 
 export function getInitials(name: string) {
@@ -77,7 +82,7 @@ export const menuData = [
     {
         link: '/pages/dashboard/projects',
         label: 'Project Management',
-        icon: Notebook 
+        icon: Notebook
     },
     // {
     //     link: '/pages/dashboard/team',
@@ -90,3 +95,38 @@ export const menuData = [
         icon: Gear
     },
 ];
+
+export const connectWithSocketIOServer = (user: User) => {
+    // let socket: Socket;
+    const socket = io("http://localhost:5000", {
+        // reconnection: true,
+        // retries: 5,
+        // autoConnect: true
+    });
+
+    socket.on("connect", () => {
+        console.log("successfully connected with socket io server");
+
+        console.log(user.id);
+
+
+        socket.emit("user-connected", {
+            userId: user?.id,
+            prevSocketId: user?.socketId
+        }, err => {
+            if (err) {
+                // the server did not acknowledge the event in the given delay
+                console.log("err", err);
+            }
+        })
+    });
+
+    socket.on("message", (data) => {
+        console.log(data)
+        toast(data?.message, undefined, "bottom-right").success()
+        // return new Notification(title, { body });
+        // return new Notification("Task Manager", { body: data?.message });
+    })
+
+    return socket;
+};  

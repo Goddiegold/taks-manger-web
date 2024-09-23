@@ -10,6 +10,7 @@ export type User = {
     email: string,
     role: user_role,
     password?: string
+    socketId?: string
 }
 
 export enum user_role {
@@ -31,6 +32,7 @@ export type Task = {
     updatedAt: Date;
     authorId: string;
 }
+
 export type Project = {
     id: string;
     name: string;
@@ -39,6 +41,7 @@ export type Project = {
     updatedAt: Date;
     authorId: string;
     assignments: string[] | Partial<AssignedProject>[]
+    author: User
 }
 
 export type AssignedProject = {
@@ -47,6 +50,8 @@ export type AssignedProject = {
     userId: string;
     projectId: string;
     assignedById: string;
+    project: AssignedProject,
+    assignedBy:User;
     createdAt: Date;
     updatedAt: Date;
 }

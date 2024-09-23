@@ -23,6 +23,7 @@ import NoDataFound from "@/app/components/NoDataFound";
 import { useFormik } from "formik";
 import * as Yup from "yup";
 import usePagination from "@/app/hooks/usePagination";
+import { formatDate } from "date-fns";
 
 const ProjectPage = () => {
   const [opened, { open, close, toggle }] = useDisclosure(false);
@@ -48,17 +49,28 @@ const ProjectPage = () => {
         queryFn: async () => {
           try {
             const res = await client().get("/projects/all")
-            const result = res.data?.result as Project[]
-            return result.map((item, idx) => {
-              const assignments = item.assignments;
-              return {
+            if (isAdmin) {
+              const result = res.data?.result as Project[]
+              return result.map((item, idx) => {
+                const assignments = item.assignments;
+                return {
+                  ...item,
+                  num: idx + 1,
+                  assignments: assignments.map((item: Partial<AssignedProject>) => item.userId) as string[]
+                }
+              })
+            } else {
+              const result = res.data?.result as AssignedProject[]
+              return result.map((item, idx) => ({
                 ...item,
                 num: idx + 1,
-                assignments: assignments.map((item: Partial<AssignedProject>) => item.userId) as string[]
-              }
-            })
+                ...item.project,
+                author: item.assignedBy,
+              }))
+            }
           } catch (error) {
             //@ts-ignore
+            console.log(error)
             toast(error?.response?.data?.message).error()
           }
         }
@@ -218,58 +230,79 @@ const ProjectPage = () => {
                   <Table.Th>S/N</Table.Th>
                   <Table.Th>Title</Table.Th>
                   <Table.Th>Description</Table.Th>
-                  <Table.Th></Table.Th>
-                  <Table.Th></Table.Th>
+                  {isAdmin ? <>
+                    <Table.Th></Table.Th>
+                    <Table.Th></Table.Th>
+                    <Table.Th></Table.Th>
+                  </> :
+                    <>
+                      <Table.Th>Assigned By</Table.Th>
+                    </>
+                  }
+                  <Table.Th>{isAdmin ? "Date added" : "Data assigned"}</Table.Th>
                 </Table.Tr>
               </Table.Thead>
               {(!!paginatedData?.length) ? <Table.Tbody>
-                {paginatedData.map((item, idx) => (
+                {paginatedData.map((item, idx) =>
+
+                (
                   <Table.Tr key={idx}>
                     <Table.Td>
                       <Badge circle className="bg-primary">
                         {item?.num}
                       </Badge>
                     </Table.Td>
-                    <Table.Td>{item.name}</Table.Td>
+                    <Table.Td>
+                      {item.name}
+                    </Table.Td>
                     <Table.Td>{item?.details}</Table.Td>
-                    <Table.Td>
-                      <Tooltip
-                        withArrow
-                        label={`Count: ${item.assignments.length}`}>
-                        <ActionIcon
-                          variant="transparent"
-                          onClick={() => {
-                            setUsersId(item?.assignments)
-                            setSelectedItem(item.id)
-                            toggleModal("assign")
-                          }
-                          }>
-                          <UserCirclePlus size={20} />
+                    {isAdmin ? <>
+                      <Table.Td>
+                        <Tooltip
+                          withArrow
+                          label={`Count: ${item.assignments.length}`}>
+                          <ActionIcon
+                            variant="transparent"
+                            onClick={() => {
+                              setUsersId(item?.assignments)
+                              setSelectedItem(item.id)
+                              toggleModal("assign")
+                            }
+                            }>
+                            <UserCirclePlus size={20} />
+                          </ActionIcon>
+                        </Tooltip>
+                      </Table.Td>
+                      <Table.Td>
+                        <ActionIcon variant="transparent" onClick={() => {
+                          setSelectedItem(item.id)
+                          formik.setValues({
+                            details: item.details!,
+                            name: item?.name,
+                            prevTitle: item?.name
+                          })
+                          toggleModal("update")
+                        }}>
+                          <PencilLine size={20} color="gray" />
                         </ActionIcon>
-                      </Tooltip>
-                    </Table.Td>
+                      </Table.Td>
+                      <Table.Td>
+                        <ActionIcon variant="transparent"
+                          loading={deletingTask && selectedItem === item.id}
+                          onClick={() => handleDelete(item.id)}>
+                          <Trash size={20} color="red" />
+                        </ActionIcon>
+                      </Table.Td>
+                    </> : <Table.Td>
+                      {item.author.name}
+                    </Table.Td>}
                     <Table.Td>
-                      <ActionIcon variant="transparent" onClick={() => {
-                        setSelectedItem(item.id)
-                        formik.setValues({
-                          details: item.details!,
-                          name: item?.name,
-                          prevTitle: item?.name
-                        })
-                        toggleModal("update")
-                      }}>
-                        <PencilLine size={20} color="gray" />
-                      </ActionIcon>
-                    </Table.Td>
-                    <Table.Td>
-                      <ActionIcon variant="transparent"
-                        loading={deletingTask && selectedItem === item.id}
-                        onClick={() => handleDelete(item.id)}>
-                        <Trash size={20} color="red" />
-                      </ActionIcon>
+                      <span>{formatDate(item.createdAt, "dd MMM, yyyy")}</span> at{" "}
+                      <span>{formatDate(item.createdAt, "hh:mma")}</span>
                     </Table.Td>
                   </Table.Tr>
-                ))}
+                )
+                )}
               </Table.Tbody> : null}
             </Table>
           </TableScrollContainer>
@@ -282,7 +315,7 @@ const ProjectPage = () => {
           </>}
         {!isLoading && (projects?.length === 0 ? <NoDataFound /> :
           <Center my={"xl"}>
-            <PaginationBtn />
+            {projects?.length > 10 && <PaginationBtn />}
           </Center>
         )}
       </ListingCard>
@@ -343,7 +376,7 @@ const ProjectPage = () => {
             <Flex className="justify-end">
               <Button
                 onClick={handleAssignUsersToProject}
-                disabled={teamMembers?.length === 0 || usersId.length ===0}
+                disabled={teamMembers?.length === 0 || usersId.length === 0}
                 loading={loading}>
                 Proceed</Button>
             </Flex>
