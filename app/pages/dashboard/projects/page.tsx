@@ -12,10 +12,12 @@ import {
   Group,
   Avatar,
   MultiSelectProps,
-  Select
+  Select,
+  Timeline,
+  ScrollArea
 } from "@mantine/core";
 import ListingCard from "../components/cards/ListingCard";
-import { Plus, Trash, PencilLine, UserCirclePlus, Check } from "@phosphor-icons/react";
+import { Plus, Trash, PencilLine, UserCirclePlus, Check, Scroll, FolderSimplePlus, ArrowsClockwise, HourglassMedium } from "@phosphor-icons/react";
 import { useDisclosure } from "@mantine/hooks";
 import { useUserContext } from "@/app/context/UserContext";
 import { useQueries, useQueryClient } from "@tanstack/react-query";
@@ -27,7 +29,7 @@ import NoDataFound from "@/app/components/NoDataFound";
 import { useFormik } from "formik";
 import * as Yup from "yup";
 import usePagination from "@/app/hooks/usePagination";
-import { formatDate } from "date-fns";
+import { formatDate, formatDistance, formatDistanceToNow } from "date-fns";
 
 const ProjectPage = () => {
   const [opened, { open, close, toggle }] = useDisclosure(false);
@@ -36,15 +38,22 @@ const ProjectPage = () => {
   const client = useClient()
   const [loading, setLoading] = useState(false)
   const isAdmin = user?.role === user_role.admin
-  const [modalType, setModalType] = useState<"create" | "update" | "assign" | null>(null)
+  const [modalType, setModalType] = useState<"create" | "update" | "assign" | "view-updates" | null>(null)
   const [selectedProjectId, setSelectedProjectId] = useState<string | null>(null)
+  const [selectedProject, setSelectedProject] = useState<Project | null>(null)
   const [deletingTask, setDeletingTask] = useState(false)
   const [usersId, setUsersId] = useState<string[]>([])
 
   const queryKeys = {
     projects: ["projects", user?.id],
-    members: ["team-members", user?.id]
+    members: ["team-members", user?.id],
+    project_updates: ["project-updates", selectedProject?.id]
   }
+
+  const modalTypeIsCreate = modalType === "create";
+  const modalTypeIsUpdate = modalType === "update";
+  const modalTypeIsAssign = modalType === "assign";
+  const modalTypeIsViewUpdates = modalType === "view-updates";
 
   const queryResults = useQueries({
     queries: [
@@ -92,17 +101,31 @@ const ProjectPage = () => {
           }
         },
         enabled: isAdmin
+      },
+      {
+        queryKey: queryKeys.project_updates,
+        queryFn: async () => {
+          try {
+            const res = await client().get("/projects/updates")
+            const result = res.data?.result as AssignedProject[]
+            return result.map((item, idx) => ({ ...item, num: idx + 1 }))
+          } catch (error) {
+            //@ts-ignore
+            toast(error?.response?.data?.message).error()
+          }
+        },
+        enabled: isAdmin && !!selectedProject && modalTypeIsViewUpdates
       }
     ]
   })
 
-  const [{ data: projects },
-    { data: teamMembers }
+  const [{ data: projects, isLoading: isLoading1 },
+    { data: teamMembers, isLoading: isLoading2 },
+    { data: projectUpdates, isLoading: isLoading3 }
   ] = queryResults;
-  const isLoading = queryResults.some(item => item.isLoading)
-  const modalTypeIsCreate = modalType === "create";
-  const modalTypeIsUpdate = modalType === "update";
-  const modalTypeIsAssign = modalType === "assign";
+  // const isLoading = queryResults.some(item => item.isLoading)
+  const isLoading = isLoading1 || isLoading2;
+
 
   const handleCreateAndUpdateTask = async (project: Partial<Project & { prevTitle?: string }>) => {
     try {
@@ -151,7 +174,7 @@ const ProjectPage = () => {
 
   const { values, touched, handleChange, handleSubmit, errors, handleBlur } = formik;
 
-  const toggleModal = (modalType: "create" | "update" | "assign" | null) => {
+  const toggleModal = (modalType: "create" | "update" | "assign" | "view-updates" | null) => {
     setModalType(modalType)
     toggle()
   }
@@ -245,7 +268,7 @@ const ProjectPage = () => {
     try {
       setSelectedProjectId(itemId)
       setLoading(true)
-      await client().get(`/projects/update/${itemId}`)
+      const res = await client().get(`/projects/update-status/${itemId}`)
       queryClient.setQueryData(queryKeys.projects, (data: Project[] | null) => {
         if (!data) return;
         return data.map(item => item.id === itemId ?
@@ -254,6 +277,7 @@ const ProjectPage = () => {
       })
       setLoading(false)
       setSelectedProjectId(null)
+      toast(res?.data?.message).success()
     } catch (error) {
       setLoading(false)
       setSelectedProjectId(null)
@@ -294,6 +318,7 @@ const ProjectPage = () => {
                     </>
                   }
                   <Table.Th>{isAdmin ? "Date added" : "Data assigned"}</Table.Th>
+                  <Table.Th></Table.Th>
                 </Table.Tr>
               </Table.Thead>
               {(!!paginatedData?.length) ? <Table.Tbody>
@@ -354,19 +379,29 @@ const ProjectPage = () => {
                       <span>{formatDate(item.createdAt, "dd MMM, yyyy")}</span> at{" "}
                       <span>{formatDate(item.createdAt, "hh:mma")}</span>
                     </Table.Td>
-                    {!isAdmin && <Table.Td>
-                      {
-                        //@ts-ignore
-                        !item?.completed ? <Tooltip label={"Mark as completed"} withArrow>
-                          <ActionIcon variant="transparent"
-                            onClick={() => {
-                              handleUpdateProjectStatus(item.id)
-                            }}
-                            loading={loading}>
-                            <Check size={20} color="green" />
-                          </ActionIcon>
-                        </Tooltip> : <Badge color="green">completed</Badge>}
-                    </Table.Td>}
+                    <Table.Td>
+                      {!isAdmin ?
+                        <>
+                          {
+                            //@ts-ignore
+                            !item?.completed ? <Tooltip label={"Mark as completed"} withArrow>
+                              <ActionIcon variant="transparent"
+                                onClick={() => {
+                                  handleUpdateProjectStatus(item.id)
+                                }}
+                                loading={loading}>
+                                <Check size={20} color="green" />
+                              </ActionIcon>
+                            </Tooltip> : <Badge color="green">completed</Badge>}
+                        </> :
+                        <Button variant="transparent"
+                          onClick={() => {
+                            // formik.setFieldValue("prevTitle", item.name)
+                            setSelectedProject(item)
+                            toggleModal("view-updates")
+                          }}>view updates</Button>
+                      }
+                    </Table.Td>
                   </Table.Tr>
                 )
                 )}
@@ -388,20 +423,24 @@ const ProjectPage = () => {
       </ListingCard>
 
       {(opened && isAdmin) &&
-        <Modal opened={opened && isAdmin}
+        <Modal
+          scrollAreaComponent={ScrollArea.Autosize}
+          opened={opened && isAdmin}
+          classNames={{
+            header: "!border-b mb-[20px]"
+          }}
           onClose={() => {
             toggleModal(null)
             formik.resetForm()
             setUsersId([])
-            if (selectedProjectId) {
-              setSelectedProjectId(null)
-            }
+            if (selectedProjectId) setSelectedProjectId(null)
+            if (selectedProject) setSelectedProject(null)
           }}
           title={modalTypeIsCreate ?
             <Text fw={600}>Create project</Text> :
             <Flex direction={"column"}>
-              <Text fw={600}>{modalTypeIsUpdate ? "Edit project" : "Assign members"}</Text>
-              <Text size="xs" c={"dimmed"}>{truncateStringAtMiddle(values.prevTitle!, 40)}</Text>
+              <Text fw={600}>{modalTypeIsUpdate ? "Edit project" : modalTypeIsAssign ? "Assign members" : "Updates"}</Text>
+              <Text size="xs" c={"dimmed"}>{truncateStringAtMiddle(values.prevTitle! || selectedProject?.name, 40)}</Text>
             </Flex>
           } centered>
 
@@ -453,6 +492,55 @@ const ProjectPage = () => {
                 loading={loading}>
                 Proceed</Button>
             </Flex>
+          </>}
+
+
+          {modalTypeIsViewUpdates && <>
+            <Timeline
+              active={1}
+              bulletSize={24}
+              lineWidth={2}>
+              <Timeline.Item
+                bullet={<FolderSimplePlus size={15} />}
+                title={selectedProject.name}>
+                <Text c="dimmed" size="sm">You created a new project.</Text>
+                <Text size="xs" mt={4}>{formatDistanceToNow(selectedProject.createdAt || new Date(), { addSuffix: true })}</Text>
+              </Timeline.Item>
+
+              {!isLoading3 ? <>
+                {projectUpdates && !!projectUpdates?.length && projectUpdates.map((item, idx) => (
+                  <>
+                    <Timeline.Item
+                      key={idx}
+                      title={<Badge
+                        color={"blue"}>Assigned</Badge>}
+                      bullet={<UserCirclePlus size={15} />}
+                      lineVariant="dashed">
+                      <Text c="dimmed" size="sm">{item?.user?.name} got assigned to this project by {item?.assignedBy?.name}</Text>
+                      <Text size="xs" mt={4}>{formatDistanceToNow(item.createdAt || new Date(), { addSuffix: true })}</Text>
+                    </Timeline.Item>
+                    <Timeline.Item
+                      key={idx}
+                      title={<Badge color={item.completed ? "green" : "yellow"}>{item.completed ? "Updated" : "Pending"}</Badge>}
+                      bullet={item.completed ? <ArrowsClockwise size={15} /> : <HourglassMedium size={15} />}
+                      lineVariant="dashed">
+                      <Text c="dimmed" size="sm">{item?.user?.name} {item.completed ? "has completed this project" : "hasn't completed this project"}</Text>
+                      <Text size="xs" mt={4}>{formatDistanceToNow(item.updatedAt || new Date(), { addSuffix: true })}</Text>
+                    </Timeline.Item>
+                  </>
+                ))}
+              </> : <>
+                {Array(5).fill(null).map((_, key) => (
+                  <Timeline.Item
+                    key={key}
+                    lineVariant="dashed">
+                    {Array(2).fill(null).map((_, key) => (
+                      <Skeleton w={"100%"} h={30} mb={"xs"} key={key} />
+                    ))}
+                  </Timeline.Item>
+                ))}
+              </>}
+            </Timeline>
           </>}
 
         </Modal>}

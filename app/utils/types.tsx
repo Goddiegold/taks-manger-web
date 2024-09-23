@@ -55,7 +55,10 @@ export type AssignedProject = {
     assignedBy: User;
     createdAt: Date;
     updatedAt: Date;
+    completed: boolean;
+    user?: User;
 }
+
 
 export enum notification_type {
     assigned_to_task = "assigned_to_task",
