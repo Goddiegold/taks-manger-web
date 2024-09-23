@@ -2,22 +2,26 @@
 "use client";
 import {
   Button, Flex, Modal, Skeleton, Table,
-  Text, Textarea, TextInput, Select,
+  Text, Textarea, TextInput,
   Badge,
   ActionIcon,
   MultiSelect,
   Center,
   TableScrollContainer,
-  Tooltip
+  Tooltip,
+  Group,
+  Avatar,
+  MultiSelectProps,
+  Select
 } from "@mantine/core";
 import ListingCard from "../components/cards/ListingCard";
-import { Plus, Trash, PencilLine, UserCirclePlus } from "@phosphor-icons/react";
+import { Plus, Trash, PencilLine, UserCirclePlus, Check } from "@phosphor-icons/react";
 import { useDisclosure } from "@mantine/hooks";
 import { useUserContext } from "@/app/context/UserContext";
 import { useQueries, useQueryClient } from "@tanstack/react-query";
-import { toast, truncateStringAtMiddle } from "@/app/utils/helper";
+import { getInitials, toast, truncateStringAtMiddle } from "@/app/utils/helper";
 import { useClient } from "@/app/utils/client";
-import { AssignedProject, Project, Task, User, user_role } from "@/app/utils/types";
+import { AssignedProject, Project, User, user_role } from "@/app/utils/types";
 import { useState } from "react";
 import NoDataFound from "@/app/components/NoDataFound";
 import { useFormik } from "formik";
@@ -33,7 +37,7 @@ const ProjectPage = () => {
   const [loading, setLoading] = useState(false)
   const isAdmin = user?.role === user_role.admin
   const [modalType, setModalType] = useState<"create" | "update" | "assign" | null>(null)
-  const [selectedItem, setSelectedItem] = useState<string | null>(null)
+  const [selectedProjectId, setSelectedProjectId] = useState<string | null>(null)
   const [deletingTask, setDeletingTask] = useState(false)
   const [usersId, setUsersId] = useState<string[]>([])
 
@@ -103,7 +107,7 @@ const ProjectPage = () => {
   const handleCreateAndUpdateTask = async (project: Partial<Project & { prevTitle?: string }>) => {
     try {
       setLoading(true)
-      const res = await client()[!modalTypeIsCreate ? "put" : "post"](modalTypeIsCreate ? "/projects/create" : `/projects/${selectedItem}`,
+      const res = await client()[!modalTypeIsCreate ? "put" : "post"](modalTypeIsCreate ? "/projects/create" : `/projects/${selectedProjectId}`,
         {
           name: project.name,
           details: project?.details
@@ -116,7 +120,7 @@ const ProjectPage = () => {
           if (modalTypeIsCreate) {
             return [{ ...newProject, assignments: [] }, ...data].map((item, idx) => ({ ...item, num: idx + 1 }))
           } else {
-            return data.map((item, idx) => item.id === selectedItem ?
+            return data.map((item, idx) => item.id === selectedProjectId ?
               { ...newProject, num: idx + 1 }
               : { num: idx + 1, ...item })
           }
@@ -154,17 +158,17 @@ const ProjectPage = () => {
 
   const handleDelete = async (itemId: string) => {
     try {
-      setSelectedItem(itemId)
+      setSelectedProjectId(itemId)
       setDeletingTask(true)
       await client().delete(`/projects/${itemId}`)
       queryClient.setQueryData(queryKeys.projects,
         (data: Project[] | null) => {
           if (!data) return null;
-          const itemIndex = data.findIndex(item => item.id === selectedItem)
+          const itemIndex = data.findIndex(item => item.id === selectedProjectId)
           return itemIndex >= 0 ? data.filter(item => item.id !== itemId) : data
 
         })
-      setSelectedItem(null)
+      setSelectedProjectId(null)
       setDeletingTask(false)
       toast("Deleted successfully!").success()
     } catch (error) {
@@ -175,20 +179,20 @@ const ProjectPage = () => {
   }
 
   const { PaginationBtn, data: paginatedData } = usePagination({
-    data: projects || [],
+    data: (projects || []) as unknown as Project[],
     itemsPerPage: 10,
     withControls: true
   })
 
   const handleAssignUsersToProject = async () => {
     try {
-      if (!selectedItem) return;
+      if (!selectedProjectId) return;
       setLoading(true)
-      await client().post(`/projects/assign/${selectedItem}`, { usersId })
+      await client().post(`/projects/assign/${selectedProjectId}`, { usersId })
       queryClient.setQueryData(queryKeys.projects, (data: Project[] | null) => {
         if (!data) return null;
         return data.map((item, idx) =>
-          item.id === selectedItem
+          item.id === selectedProjectId
             ? {
               ...item,
               assignments: Array.from(new Set([...item.assignments, ...usersId])),
@@ -197,7 +201,7 @@ const ProjectPage = () => {
             : { ...item, num: idx + 1 }
         );
       });
-      setSelectedItem(null)
+      setSelectedProjectId(null)
       setUsersId([])
       setLoading(false)
       close()
@@ -208,6 +212,56 @@ const ProjectPage = () => {
       toast(error?.response?.data?.message).error()
     }
   }
+
+  const renderMultiSelectOption: MultiSelectProps['renderOption'] = ({ option, checked }) => {
+
+    const getUser = () => {
+      const user = teamMembers.find(item => item?.id === option?.value)
+      return user;
+    }
+
+    const user = getUser()
+
+    return (
+      <Group gap="sm"
+        onClick={() => console.log("i got selected", { ...option, checked })}
+      >
+        <Avatar
+          size={36} radius="xl" >
+          {getInitials(user?.name)}
+        </Avatar>
+        <div>
+          <Text size="sm">{user?.name}</Text>
+          <Text size="xs" opacity={0.5}>
+            {user?.email}
+          </Text>
+        </div>
+      </Group>
+    );
+  }
+
+  const handleUpdateProjectStatus = async (itemId: string) => {
+    if (isAdmin) return;
+    try {
+      setSelectedProjectId(itemId)
+      setLoading(true)
+      await client().get(`/projects/update/${itemId}`)
+      queryClient.setQueryData(queryKeys.projects, (data: Project[] | null) => {
+        if (!data) return;
+        return data.map(item => item.id === itemId ?
+          { ...item, completed: true }
+          : item)
+      })
+      setLoading(false)
+      setSelectedProjectId(null)
+    } catch (error) {
+      setLoading(false)
+      setSelectedProjectId(null)
+      //@ts-ignore
+      toast(error?.response?.data?.message).error()
+    }
+  }
+
   return (
     <>
       {(isAdmin && !isLoading) && <Flex justify={"flex-end"} my={"sm"}>
@@ -264,8 +318,8 @@ const ProjectPage = () => {
                           <ActionIcon
                             variant="transparent"
                             onClick={() => {
-                              setUsersId(item?.assignments)
-                              setSelectedItem(item.id)
+                              setUsersId(item?.assignments as string[])
+                              setSelectedProjectId(item.id)
                               toggleModal("assign")
                             }
                             }>
@@ -275,7 +329,7 @@ const ProjectPage = () => {
                       </Table.Td>
                       <Table.Td>
                         <ActionIcon variant="transparent" onClick={() => {
-                          setSelectedItem(item.id)
+                          setSelectedProjectId(item.id)
                           formik.setValues({
                             details: item.details!,
                             name: item?.name,
@@ -288,7 +342,7 @@ const ProjectPage = () => {
                       </Table.Td>
                       <Table.Td>
                         <ActionIcon variant="transparent"
-                          loading={deletingTask && selectedItem === item.id}
+                          loading={deletingTask && selectedProjectId === item.id}
                           onClick={() => handleDelete(item.id)}>
                           <Trash size={20} color="red" />
                         </ActionIcon>
@@ -300,6 +354,19 @@ const ProjectPage = () => {
                       <span>{formatDate(item.createdAt, "dd MMM, yyyy")}</span> at{" "}
                       <span>{formatDate(item.createdAt, "hh:mma")}</span>
                     </Table.Td>
+                    {!isAdmin && <Table.Td>
+                      {
+                        //@ts-ignore
+                        !item?.completed ? <Tooltip label={"Mark as completed"} withArrow>
+                          <ActionIcon variant="transparent"
+                            onClick={() => {
+                              handleUpdateProjectStatus(item.id)
+                            }}
+                            loading={loading}>
+                            <Check size={20} color="green" />
+                          </ActionIcon>
+                        </Tooltip> : <Badge color="green">completed</Badge>}
+                    </Table.Td>}
                   </Table.Tr>
                 )
                 )}
@@ -326,8 +393,8 @@ const ProjectPage = () => {
             toggleModal(null)
             formik.resetForm()
             setUsersId([])
-            if (selectedItem) {
-              setSelectedItem(null)
+            if (selectedProjectId) {
+              setSelectedProjectId(null)
             }
           }}
           title={modalTypeIsCreate ?
@@ -338,40 +405,46 @@ const ProjectPage = () => {
             </Flex>
           } centered>
 
-          {(modalTypeIsCreate || modalTypeIsUpdate) && <form onSubmit={handleSubmit}>
-            <TextInput
-              withAsterisk
-              value={values.name}
-              onChange={handleChange("name")}
-              onBlur={handleBlur("name")}
-              label={"Title"}
-              error={(touched.name && !!errors.name) ? errors?.name : null}
-            />
-            <Textarea
-              withAsterisk
-              minRows={3}
-              maxRows={7}
-              label={"Description"}
-              onBlur={handleBlur("details")}
-              mb={"xs"}
-              value={values.details}
-              onChange={handleChange("details")}
-              error={(touched.details && !!errors.details) ? errors?.details : null}
-            />
-            <Flex className="justify-end">
-              <Button type="submit"
-                loading={loading}>
-                Proceed</Button>
-            </Flex>
-          </form>}
+          {(modalTypeIsCreate || modalTypeIsUpdate) &&
+            <form onSubmit={handleSubmit}>
+              <TextInput
+                withAsterisk
+                value={values.name}
+                onChange={handleChange("name")}
+                onBlur={handleBlur("name")}
+                label={"Title"}
+                error={(touched.name && !!errors.name) ? errors?.name : null}
+              />
+              <Textarea
+                withAsterisk
+                minRows={3}
+                maxRows={7}
+                label={"Description"}
+                onBlur={handleBlur("details")}
+                mb={"xs"}
+                value={values.details}
+                onChange={handleChange("details")}
+                error={(touched.details && !!errors.details) ? errors?.details : null}
+              />
+              <Flex className="justify-end">
+                <Button type="submit"
+                  loading={loading}>
+                  Proceed</Button>
+              </Flex>
+            </form>}
 
           {modalTypeIsAssign && <>
             <MultiSelect
+              checkIconPosition="right"
               disabled={teamMembers?.length === 0}
               mb={"xs"}
+              searchable
+              multiple
+              renderOption={renderMultiSelectOption}
               data={teamMembers?.map(item => ({ label: item.name, value: item.id }))}
               value={usersId}
               onChange={(value) => setUsersId(value)}
+              hidePickedOptions
             />
             <Flex className="justify-end">
               <Button

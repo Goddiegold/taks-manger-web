@@ -41,6 +41,7 @@ export type Project = {
     updatedAt: Date;
     authorId: string;
     assignments: string[] | Partial<AssignedProject>[]
+    num?: string,
     author: User
 }
 
@@ -51,7 +52,14 @@ export type AssignedProject = {
     projectId: string;
     assignedById: string;
     project: AssignedProject,
-    assignedBy:User;
+    assignedBy: User;
     createdAt: Date;
     updatedAt: Date;
+}
+
+export enum notification_type {
+    assigned_to_task = "assigned_to_task",
+    assigned_to_project = "assigned_to_project",
+    updated_task = "updated_task",
+    updated_project = "updated_project",
 }

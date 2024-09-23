@@ -122,10 +122,7 @@ export const connectWithSocketIOServer = (user: User) => {
     });
 
     socket.on("message", (data) => {
-        console.log(data)
-        toast(data?.message, undefined, "bottom-right").success()
-        // return new Notification(title, { body });
-        // return new Notification("Task Manager", { body: data?.message });
+        toast(data?.message, undefined,).success()
     })
 
     return socket;
