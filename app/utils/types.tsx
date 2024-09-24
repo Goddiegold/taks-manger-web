@@ -11,6 +11,8 @@ export type User = {
     role: user_role,
     password?: string
     socketId?: string
+    emailNotification: boolean
+    pushNotification: boolean
 }
 
 export enum user_role {

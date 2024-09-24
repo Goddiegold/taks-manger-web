@@ -31,7 +31,7 @@ const LoginPage = () => {
         }
       })
       toast(res?.data?.message).success()
-      router.push("/pages/dashboard")
+      router.push("/pages/dashboard/projects")
       setLoading(false)
     } catch (error) {
       setLoading(false)

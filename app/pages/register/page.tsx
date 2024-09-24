@@ -10,12 +10,14 @@ import client from "../../utils/client";
 import { toast } from "@/app/utils/helper";
 import { Action_Type, User } from "@/app/utils/types";
 import { useUserContext } from "@/app/context/UserContext";
+import { useRouter } from "next/navigation";
 
 
 const RegisterPage = () => {
 
   const [loading, setLoading] = useState(false);
   const { userDispatch } = useUserContext()
+  const router = useRouter()
 
   const handleRegister = async (user: Partial<User>) => {
     try {
@@ -32,6 +34,7 @@ const RegisterPage = () => {
       })
       toast(res?.data?.message).success()
       formik.resetForm()
+      router.push("/pages/dashboard/projects")
       setLoading(false)
     } catch (error) {
       setLoading(false)
