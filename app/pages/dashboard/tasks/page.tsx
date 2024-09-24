@@ -151,7 +151,8 @@ const TasksPage = () => {
   const { PaginationBtn, data: paginatedData } = usePagination({
     data: tasks || [],
     itemsPerPage: 10,
-    withControls: true
+    withControls: true, 
+    watchForUpdates:true
   })
 
   return (
