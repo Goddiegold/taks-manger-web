@@ -67,10 +67,10 @@ const NotificationPrefences = () => {
             </Switch.Group>
             <Button
             loading={loading}
-                size="sm"
+                size="xs"
                 disabled={value.length === 0}
                 maw={100}
-                onClick={handleUpdate} mt={"md"}>Proceed</Button>
+                onClick={handleUpdate} mt={"md"}>Update</Button>
 
         </Flex>
     );

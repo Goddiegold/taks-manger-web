@@ -108,7 +108,7 @@ const LoginPage = () => {
           type="submit"
           radius="md"
         >
-          Login in
+          Login
         </Button>
       </form>
     </AuthLayout>
