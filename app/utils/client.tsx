@@ -6,7 +6,7 @@ import { toast, userToken } from "./helper";
 
 const client = (token?: string) => {
     const axiosInstance = axios.create({
-        baseURL: !process.env.NEXT_PUBLIC_ENV ? "http://localhost:5000/api" : "https://task-manager-server-uw4k.onrender.com/api",
+        baseURL: !process.env.NEXT_PUBLIC_PROD ? "http://localhost:5000/api" : "https://task-manager-server-uw4k.onrender.com/api",
     })
 
     const authToken = token || userToken()
