@@ -106,7 +106,7 @@ const ProjectPage = () => {
         queryKey: queryKeys.project_updates,
         queryFn: async () => {
           try {
-            const res = await client().get("/projects/updates")
+            const res = await client().get(`/projects/updates/${selectedProject.id}`)
             const result = res.data?.result as AssignedProject[]
             return result.map((item, idx) => ({ ...item, num: idx + 1 }))
           } catch (error) {
@@ -144,7 +144,7 @@ const ProjectPage = () => {
             return [{ ...newProject, assignments: [] }, ...data].map((item, idx) => ({ ...item, num: idx + 1 }))
           } else {
             return data.map((item, idx) => item.id === selectedProjectId ?
-              { ...newProject, num: idx + 1, assignments: []}
+              { ...newProject, num: idx + 1, assignments: [] }
               : { num: idx + 1, ...item })
           }
         })
@@ -187,8 +187,10 @@ const ProjectPage = () => {
       queryClient.setQueryData(queryKeys.projects,
         (data: Project[] | null) => {
           if (!data) return null;
-          const itemIndex = data.findIndex(item => item.id === selectedProjectId)
-          return itemIndex >= 0 ? data.filter(item => item.id !== itemId) : data
+          // const itemIndex = data.findIndex(item => item.id === selectedProjectId)
+          // if (itemIndex !== -1) {
+          return data.filter(item => item.id !== itemId);
+          // }
 
         })
       setSelectedProjectId(null)

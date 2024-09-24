@@ -134,8 +134,8 @@ const TasksPage = () => {
       queryClient.setQueryData(queryKeys.tasks,
         (data: Task[] | null) => {
           if (!data) return null;
-          const itemIndex = data.findIndex(item => item.id === selectedItem)
-          return itemIndex >= 0 ? data.filter(item => item.id !== itemId) : data
+          // const itemIndex = data.findIndex(item => item.id === selectedItem)
+          return data.filter(item => item.id !== itemId)
 
         })
       setSelectedItem(null)
@@ -151,8 +151,8 @@ const TasksPage = () => {
   const { PaginationBtn, data: paginatedData } = usePagination({
     data: tasks || [],
     itemsPerPage: 10,
-    withControls: true, 
-    watchForUpdates:true
+    withControls: true,
+    watchForUpdates: true
   })
 
   return (
@@ -237,6 +237,7 @@ const TasksPage = () => {
             if (selectedItem) {
               setSelectedItem(null)
             }
+            formik.resetForm()
           }}
           title={modalTypeIsCreate ?
             <Text fw={600}>Create new task</Text> :

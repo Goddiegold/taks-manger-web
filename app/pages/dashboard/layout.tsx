@@ -53,7 +53,8 @@ export default function DashboardLayout({ children }: PropsWithChildren) {
                 </AppShell.Header>
 
                 <AppShell.Navbar >
-                    <Sidebar />
+                    <Sidebar mobileOpened={mobileOpened}
+                        toggleMobile={toggleMobile} />
                 </AppShell.Navbar>
                 <AppShell.Main
 

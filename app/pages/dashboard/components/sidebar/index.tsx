@@ -7,17 +7,23 @@ import classes from './styles.module.css';
 import { Action_Type } from '@/app/utils/types';
 import { SignOut } from '@phosphor-icons/react';
 
-export default function Sidebar() {
-    const { user, userDispatch } = useUserContext()
+
+interface Props {
+  mobileOpened: boolean,
+  toggleMobile: () => void,
+}
+
+export default function Sidebar({ mobileOpened, toggleMobile }: Props) {
+  const { user, userDispatch } = useUserContext()
   const [active, setActive] = useState('Billing');
   const [userMenuData, setMenuData] = useState(menuData)
   const router = useRouter()
 
   const pathname = usePathname();
 
-    useEffect(() => {
-      setActive(pathname)
-    }, [pathname])
+  useEffect(() => {
+    setActive(pathname)
+  }, [pathname])
 
   const links = userMenuData.map((item) => (
     <a
@@ -27,9 +33,10 @@ export default function Sidebar() {
       key={item.label}
       onClick={(event) => {
         event.preventDefault();
-        if(item.link==="#") return;
+        if (item.link === "#") return;
         router.push(item.link)
         setActive(item.link);
+        toggleMobile()
       }}
     >
       <item.icon size={20} className={`${classes.linkIcon} text-white`} stroke='1.5' />
@@ -41,8 +48,8 @@ export default function Sidebar() {
   const handleLogout = () => {
     removeUserToken()
     userDispatch({
-        type: Action_Type.LOGOUT_USER,
-        payload: null
+      type: Action_Type.LOGOUT_USER,
+      payload: null
     })
     router.push("/pages/login")
   }
@@ -63,7 +70,7 @@ export default function Sidebar() {
               event.preventDefault()
               handleLogout()
             }}>
-            <SignOut className={classes.linkIcon} stroke={"1.5"}/>
+            <SignOut className={classes.linkIcon} stroke={"1.5"} />
             <span>Logout</span>
           </a>
         </div>
