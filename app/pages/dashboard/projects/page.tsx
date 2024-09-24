@@ -144,7 +144,7 @@ const ProjectPage = () => {
             return [{ ...newProject, assignments: [] }, ...data].map((item, idx) => ({ ...item, num: idx + 1 }))
           } else {
             return data.map((item, idx) => item.id === selectedProjectId ?
-              { ...newProject, num: idx + 1 }
+              { ...newProject, num: idx + 1, assignments: []}
               : { num: idx + 1, ...item })
           }
         })
@@ -204,7 +204,8 @@ const ProjectPage = () => {
   const { PaginationBtn, data: paginatedData } = usePagination({
     data: (projects || []) as unknown as Project[],
     itemsPerPage: 10,
-    withControls: true
+    withControls: true,
+    watchForUpdates: true,
   })
 
   const handleAssignUsersToProject = async () => {
@@ -427,7 +428,7 @@ const ProjectPage = () => {
           scrollAreaComponent={ScrollArea.Autosize}
           opened={opened && isAdmin}
           classNames={{
-            header: "!border-b mb-[20px]"
+            header: "!border-b mb-[10px]"
           }}
           onClose={() => {
             toggleModal(null)
@@ -455,6 +456,7 @@ const ProjectPage = () => {
                 error={(touched.name && !!errors.name) ? errors?.name : null}
               />
               <Textarea
+                my={"xs"}
                 withAsterisk
                 minRows={3}
                 maxRows={7}
