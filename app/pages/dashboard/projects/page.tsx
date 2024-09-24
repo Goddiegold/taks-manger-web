@@ -230,7 +230,7 @@ const ProjectPage = () => {
       close()
       toast("Assign users successfully").success()
     } catch (error) {
-      setLoading(true)
+      setLoading(false)
       //@ts-ignore
       toast(error?.response?.data?.message).error()
     }
